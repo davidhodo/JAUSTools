@@ -1,15 +1,20 @@
-## Project Setup
-cmake_minimum_required(VERSION 2.4.6)
+#############################################################
+#   Top level CMakeLists.txt file for the JAUSTools Project
+#############################################################
 
-project(network_GPS)
 
-## Configurations
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR)
 
 # Use clang if available
-IF(EXISTS /usr/bin/clang)
+IF(EXISTS /usr/bin/clang++)
   set(CMAKE_CXX_COMPILER /usr/bin/clang++)
-ENDIF(EXISTS /usr/bin/clang)
+ENDIF(EXISTS /usr/bin/clang++)
 
+PROJECT(JAUSTools)
+
+###############################################################################
+# Tell CMake where to look for find moduleXYZ files
+#SET( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" )
 
 # Allow for building shared libs override
 IF(NOT BUILD_SHARED_LIBS)
@@ -30,86 +35,33 @@ IF(NOT LIBRARY_OUTPUT_PATH)
     set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 ENDIF(NOT LIBRARY_OUTPUT_PATH)
 
-## Configure build system
 
-# Add the include folder to the include path
-include_directories(${PROJECT_SOURCE_DIR}/include)
+##########################################################
+# Decide what to build
+##########################################################
 
-# Add default source files
-set(GPS_SRCS src/MockGPS.cpp include/GPSNetworkInterface.h include/MockGPS.h)
+############# gCommon ################
+SET( BUILD_PRIMITIVEJOYSTICK ON CACHE BOOL "Build Primitive Driver Joystick app")
+IF(BUILD_PRIMITIVEJOYSTICK)
+    SET(BUILD_DIRS ${BUILD_DIRS} PrimitiveDriverJoystick)
+ENDIF(BUILD_PRIMITIVEJOYSTICK)
 
-# Add header files
-set(GPS_HEADERS ${PROJECT_SOURCE_DIR}/include/GPSNetworkInterface.h ${PROJECT_SOURCE_DIR}/include/MockGPS.h)
+##########################################################
+# Set up include directories that are needed by all proj.
+#find_package(Boost COMPONENTS system filesystem thread REQUIRED)
+find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
 
-## Build the library
-#set(GPS_LINK_LIBS  serial)
+SET(JAUSLIBS ${JAUSLIBS} json openjaus-core openjaus)
 
-# Compile the GPS Interface Library
-add_library(atrv ${ATRV_SRCS})
-target_link_libraries(atrv ${ATRV_LINK_LIBS})
-## Build Examples
+SET( LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib CACHE PATH
+     "Output directory for the JAUSTools libraries" )
+SET( EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin CACHE PATH
+     "Output directory for the JAUSTools executables" )
 
-# If specified
-IF(ATRV_BUILD_EXAMPLES)
-  # Compile the Example program
-  add_executable(atrv_example examples/atrv_example.cpp)
-  # Link the Test program to the atrv library
-  target_link_libraries(atrv_example atrv ${ATRV_LINK_LIBS})
-ENDIF(ATRV_BUILD_EXAMPLES)
+###############################################################################
+# be helpful and let all projects look for libraries here
+LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH} ${BOOST_LIB_DIR})
 
-## Build Tests
-
-# If specified
-IF(ATRV_BUILD_TESTS)
-  # Find Google Test
-  enable_testing()
-  find_package(GTest REQUIRED)
-  include_directories(${GTEST_INCLUDE_DIRS})
-
-  # Compile the Test program
-  add_executable(atrv_tests tests/atrv_tests.cpp)
-  # Link the Test program to the atrv library
-  target_link_libraries(atrv_tests atrv ${GTEST_BOTH_LIBRARIES})
-  add_test(AllTestsIntest_atrv atrv_tests)
-ENDIF(ATRV_BUILD_TESTS)
-
-# Configure make install
-IF(NOT CMAKE_INSTALL_PREFIX)
-  SET(CMAKE_INSTALL_PREFIX /usr/local)
-ENDIF(NOT CMAKE_INSTALL_PREFIX)
-
-## Install setup
-
-# Install the library
-IF(NOT ATRV_DONT_SETUP_INSTALL)
-    INSTALL(
-            TARGETS atrv
-            RUNTIME DESTINATION bin
-            LIBRARY DESTINATION lib
-            ARCHIVE DESTINATION lib
-    )
-
-    INSTALL(FILES ${ATRV_HEADERS} DESTINATION include/atrv)
-
-    IF(NOT CMAKE_FIND_INSTALL_PATH)
-        set(CMAKE_FIND_INSTALL_PATH ${CMAKE_ROOT})
-    ENDIF(NOT CMAKE_FIND_INSTALL_PATH)
-
-    INSTALL(FILES Findatrv.cmake DESTINATION
-            ${CMAKE_FIND_INSTALL_PATH}/Modules/)
-
-    ADD_CUSTOM_TARGET(uninstall @echo uninstall package)
-
-    IF(UNIX)
-      ADD_CUSTOM_COMMAND(
-                         COMMENT "uninstall package"
-                         COMMAND xargs ARGS rm < install_manifest.txt
-                         TARGET  uninstall
-      )
-    ELSE(UNIX)
-      ADD_CUSTOM_COMMAND(
-                         COMMENT "uninstall only implemented in unix"
-                         TARGET  uninstall
-      )
-    ENDIF(UNIX)
-ENDIF(NOT ATRV_DONT_SETUP_INSTALL)
+# GO FORTH!
+SUBDIRS(${BUILD_DIRS})
