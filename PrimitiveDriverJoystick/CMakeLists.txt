@@ -1,11 +1,16 @@
 PROJECT(PrimitiveDriverJoystick)
 
+INCLUDE_DIRECTORIES(include)
+
 #what files are needed?
-SET(JOYSTICK_SRCS main.cpp PrimitiveDriverJoystick.h PrimitiveDriverJoystick.cpp joystick.cpp joystick.h 
+SET(JOYSTICK_SRCS src/main.cpp include/PrimitiveDriverJoystick.h src/PrimitiveDriverJoystick.cpp src/joystick.cpp include/joystick.h 
    ${RESOURCES})
 
 # Add executable called gUSARSim
 ADD_EXECUTABLE(PrimitiveDriverJoystick ${JOYSTICK_SRCS})
+
+# add mobility library to link list
+SET(JAUSLIBS ${JAUSLIBS} openjaus-mobility)
 
 # link again multimedia library in windows
 IF(WIN32)
