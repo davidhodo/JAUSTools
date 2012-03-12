@@ -43,11 +43,19 @@ bool PrimitiveDriverJoystick::requestDriverControl() {
 	}
 
 	requestControl(driverList.at(0), processControlResponse);
+	std::cout << "Request Control of Primitive Driver at " << driverList.at(0) << std::endl;
 	return true;
 }
 
 bool PrimitiveDriverJoystick::releaseDriverControl() {
+	try {
+		releaseControl(driverList.at(0));
+		std::cout << "Request Control of Primitive Driver at " << driverList.at(0) << std::endl;
 
+	} catch (exception &e) {
+
+
+	}
 }
 
 void PrimitiveDriverJoystick::run(int interval) {
@@ -87,6 +95,12 @@ void PrimitiveDriverJoystick::readJoystick(openjaus::system::Timer *timer){
 		cout << "Error reading joystick and sending ." << endl;
 	}
 
+}
+
+
+void PrimitiveDriverJoystick::processControlResponse(const openjaus::model::ControlResponse& response) {
+	std::cout << "Recv Control Request Response from: " << response.getAddress() << std::endl;
+	std::cout << "Response code: " << response.getResponseType() << std::endl;
 }
 
 

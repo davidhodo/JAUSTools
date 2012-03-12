@@ -34,6 +34,12 @@ int main(void)
 				case '1':
 					myDriver.findPrimitiveDriver();
 					break;
+				case '2':
+					myDriver.requestDriverControl();
+					break;
+				case '3':
+					myDriver.releaseDriverControl();
+					break;
 			}
 		}
 	}

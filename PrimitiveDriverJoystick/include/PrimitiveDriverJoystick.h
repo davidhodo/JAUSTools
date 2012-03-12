@@ -15,6 +15,7 @@ using namespace std;
 namespace JAUSTools
 {
 
+
 class PrimitiveDriverJoystick : public openjaus::core::Base
 {
 
@@ -32,7 +33,7 @@ public:
 
 protected:
 
-	void processControlResponse(const model::ControlResponse& response);
+	static void processControlResponse(const openjaus::model::ControlResponse& response);
 
 	void readJoystick(openjaus::system::Timer *timer);
 
