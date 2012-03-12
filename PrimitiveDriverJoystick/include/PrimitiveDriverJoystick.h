@@ -8,6 +8,9 @@
 #include <openjaus.h>
 #include <openjaus/mobility.h>
 #include <openjaus/core/Base.h>
+#include "joystick.h"
+#include <string>
+using namespace std;
 
 namespace JAUSTools
 {
@@ -22,9 +25,14 @@ public:
 	void run(int interval=100);
 	void stop();
 
+	//TODO: add argument to allow driver to be specified if multiple are present
 	bool findPrimitiveDriver();
+	bool requestDriverControl();
+	bool releaseDriverControl();
 
 protected:
+
+	void processControlResponse(const model::ControlResponse& response);
 
 	void readJoystick(openjaus::system::Timer *timer);
 
@@ -37,9 +45,9 @@ protected:
 	JoystickStatus curStatus;	//!< last read joystick status
 
 	bool primDriverFound;
-	openjaus::transport::Address primDriverAddr;
-
+	std::vector<openjaus::transport::Address> driverList;
 };
+
 
 } // namespace JAUSTools
 
