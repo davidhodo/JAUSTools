@@ -1,4 +1,5 @@
 #include "PrimitiveDriverJoystick.h"
+#include <iostream>
 
 void printMenu()
 {
@@ -7,6 +8,7 @@ void printMenu()
 	std::cout << "1 - Find Primitive Driver" << std::endl;
 	std::cout << "2 - Request Primitive Driver Control" << std::endl;
 	std::cout << "3 - Release Primitive Driver Control" << std::endl;
+	std::cout << "4 - Start reading joystick." << std::endl;
 	std::cout << "? - Output Menu" << std::endl;
 	std::cout << "ESC - Exit Component" << std::endl;
 };
@@ -19,6 +21,16 @@ int main(void)
 		JAUSTools::PrimitiveDriverJoystick myDriver;
 		myDriver.run();
 
+		printMenu();
+
+		usleep(2000000);
+		myDriver.findPrimitiveDriver();
+		myDriver.requestDriverControl();
+		usleep(2000000);
+		myDriver.sendQuery();
+		myDriver.sendCommand();
+		//myDriver.startJoystickThread();
+
 		unsigned char choice = 0;
 		while(choice != 27) // ESC
 		{
@@ -26,7 +38,7 @@ int main(void)
 			switch(choice)
 			{
 				case 't':
-					LOG(myDriver.getSystemTree()->toString());
+					std::cout << myDriver.getSystemTree()->toString();
 					break;
 				case '?':
 					printMenu();
@@ -39,6 +51,14 @@ int main(void)
 					break;
 				case '3':
 					myDriver.releaseDriverControl();
+					break;
+				case '4':
+					myDriver.startJoystickThread();
+					break;
+				case '5':
+					myDriver.sendQuery();
+				case '6':
+					myDriver.sendCommand();
 					break;
 			}
 		}

@@ -23,7 +23,7 @@ public:
 	PrimitiveDriverJoystick();
 	~PrimitiveDriverJoystick();
 
-	void run(int interval=100);
+	void run();
 	void stop();
 
 	//TODO: add argument to allow driver to be specified if multiple are present
@@ -31,13 +31,17 @@ public:
 	bool requestDriverControl();
 	bool releaseDriverControl();
 
+	void startJoystickThread(int interval=100);
+
+	void sendCommand();
+	void sendQuery();
 protected:
 
 	static void processControlResponse(const openjaus::model::ControlResponse& response);
 
 	void readJoystick(openjaus::system::Timer *timer);
 
-	openjaus::mobility::SetWrenchEffort wrenchEffort;
+	openjaus::mobility::SetWrenchEffort *wrenchEffort;
 	openjaus::system::Timer *joystickTimer;
 
 	string devName; //!< joystick device address
@@ -47,6 +51,7 @@ protected:
 
 	bool primDriverFound;
 	std::vector<openjaus::transport::Address> driverList;
+	openjaus::transport::Address primDriverAddr;
 };
 
 
