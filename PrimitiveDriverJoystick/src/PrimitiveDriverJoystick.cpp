@@ -99,7 +99,7 @@ void PrimitiveDriverJoystick::sendQuery() {
 	openjaus::mobility::QueryWrenchEffort *qry=new openjaus::mobility::QueryWrenchEffort;
 	qry->setQueryPresenceVector(65535);
 	qry->setDestination(primDriverAddr);
-	std::cout <<"Sending Query" << std::endl;
+	std::cout <<"Sending Query" << qry->toXml() << std::endl;
 	sendMessage(qry);
 
 }

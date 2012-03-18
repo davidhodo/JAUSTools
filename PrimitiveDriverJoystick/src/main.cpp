@@ -9,6 +9,8 @@ void printMenu()
 	std::cout << "2 - Request Primitive Driver Control" << std::endl;
 	std::cout << "3 - Release Primitive Driver Control" << std::endl;
 	std::cout << "4 - Start reading joystick." << std::endl;
+	std::cout << "5 - Send query" << std::endl;
+	std::cout << "6 - Send command" << std::endl;
 	std::cout << "? - Output Menu" << std::endl;
 	std::cout << "ESC - Exit Component" << std::endl;
 };
@@ -24,11 +26,11 @@ int main(void)
 		printMenu();
 
 		usleep(2000000);
-		myDriver.findPrimitiveDriver();
-		myDriver.requestDriverControl();
-		usleep(2000000);
-		myDriver.sendQuery();
-		myDriver.sendCommand();
+		//myDriver.findPrimitiveDriver();
+		//myDriver.requestDriverControl();
+		//usleep(2000000);
+		//myDriver.sendQuery();
+		//myDriver.sendCommand();
 		//myDriver.startJoystickThread();
 
 		unsigned char choice = 0;
@@ -57,6 +59,7 @@ int main(void)
 					break;
 				case '5':
 					myDriver.sendQuery();
+					break;
 				case '6':
 					myDriver.sendCommand();
 					break;
