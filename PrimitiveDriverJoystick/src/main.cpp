@@ -11,6 +11,7 @@ void printMenu()
 	std::cout << "4 - Start reading joystick." << std::endl;
 	std::cout << "5 - Send query" << std::endl;
 	std::cout << "6 - Send command" << std::endl;
+	std::cout << "7 - Resume Driver" << std::endl;
 	std::cout << "? - Output Menu" << std::endl;
 	std::cout << "ESC - Exit Component" << std::endl;
 };
@@ -62,6 +63,9 @@ int main(void)
 					break;
 				case '6':
 					myDriver.sendCommand();
+					break;
+				case '7':
+					myDriver.resumeDriver();
 					break;
 			}
 		}

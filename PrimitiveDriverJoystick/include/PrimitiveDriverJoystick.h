@@ -30,6 +30,7 @@ public:
 	bool findPrimitiveDriver();
 	bool requestDriverControl();
 	bool releaseDriverControl();
+	bool resumeDriver();
 
 	void startJoystickThread(int interval=100);
 

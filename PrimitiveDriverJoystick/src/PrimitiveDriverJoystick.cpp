@@ -56,7 +56,7 @@ bool PrimitiveDriverJoystick::requestDriverControl() {
 
 bool PrimitiveDriverJoystick::releaseDriverControl() {
 	try {
-		releaseControl(wrenchEffort->getDestination());
+		releaseControl(primDriverAddr);
 		std::cout << "Release Control of Primitive Driver at " << wrenchEffort->getDestination() << std::endl;
 
 	} catch (exception &e) {
@@ -64,6 +64,13 @@ bool PrimitiveDriverJoystick::releaseDriverControl() {
 		return false;
 	}
 	return true;
+}
+
+bool PrimitiveDriverJoystick::resumeDriver() {
+	openjaus::core::Resume *res = new openjaus::core::Resume;
+	res->setDestination(primDriverAddr);
+	std::cout << "Sending message: " << res->toXml() << std::endl;
+	sendMessage(res);
 }
 
 void PrimitiveDriverJoystick::run() {
