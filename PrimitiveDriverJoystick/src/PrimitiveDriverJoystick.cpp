@@ -71,6 +71,7 @@ bool PrimitiveDriverJoystick::resumeDriver() {
 	res->setDestination(primDriverAddr);
 	std::cout << "Sending message: " << res->toXml() << std::endl;
 	sendMessage(res);
+	return true;
 }
 
 void PrimitiveDriverJoystick::run() {
