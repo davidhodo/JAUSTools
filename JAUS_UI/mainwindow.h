@@ -7,6 +7,8 @@
 #include <openjaus/core/Base.h>
 #include <openjaus/mobility/GlobalPoseSensor.h>
 
+#include <map>
+
 namespace Ui {
     class MainWindow;
 }
@@ -21,6 +23,8 @@ public:
 
 private slots:
     void on_pushButton_clicked();
+
+    void on_pbQueryServices_clicked();
 
 private:
     Ui::MainWindow *ui;

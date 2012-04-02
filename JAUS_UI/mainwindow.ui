@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>736</width>
-    <height>537</height>
+    <width>849</width>
+    <height>585</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>10</x>
       <y>10</y>
       <width>431</width>
-      <height>221</height>
+      <height>361</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -40,26 +40,11 @@
     <property name="title">
      <string>Discovered Services List</string>
     </property>
-    <widget class="QTreeWidget" name="trwServices">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>411</width>
-       <height>141</height>
-      </rect>
-     </property>
-     <column>
-      <property name="text">
-       <string notr="true">1</string>
-      </property>
-     </column>
-    </widget>
     <widget class="QPushButton" name="pbQueryServices">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>180</y>
+       <y>320</y>
        <width>121</width>
        <height>27</height>
       </rect>
@@ -72,7 +57,7 @@
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>180</y>
+       <y>320</y>
        <width>121</width>
        <height>27</height>
       </rect>
@@ -84,10 +69,20 @@
     <widget class="QLineEdit" name="lineEdit">
      <property name="geometry">
       <rect>
-       <x>270</x>
-       <y>180</y>
+       <x>260</x>
+       <y>320</y>
        <width>151</width>
        <height>27</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QTreeView" name="treeServices">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>411</width>
+       <height>291</height>
       </rect>
      </property>
     </widget>
@@ -95,9 +90,9 @@
    <widget class="QTextEdit" name="txtConsoleOutput">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>330</y>
-      <width>721</width>
+      <x>0</x>
+      <y>380</y>
+      <width>841</width>
       <height>141</height>
      </rect>
     </property>
@@ -105,8 +100,8 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>250</y>
+      <x>440</x>
+      <y>10</y>
       <width>97</width>
       <height>27</height>
      </rect>
@@ -115,13 +110,36 @@
      <string>PushButton</string>
     </property>
    </widget>
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>40</y>
+      <width>391</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Tab 1</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Tab 2</string>
+     </attribute>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>736</width>
+     <width>849</width>
      <height>25</height>
     </rect>
    </property>
