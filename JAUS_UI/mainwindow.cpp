@@ -4,6 +4,7 @@
 #include <QStandardItem>
 #include <map>
 #include <iterator>
+#include <sstream>
 #include <openjaus/types.h>
 #include <openjaus/model/SystemTree.h>
 #include <openjaus/model/Subsystem.h>
@@ -86,32 +87,47 @@ void MainWindow::on_pbQueryServices_clicked()
     QStandardItem *prevItem = standardModel->invisibleRootItem();
 
     for (it_subsys it_ss = subsystems.begin(); it_ss!=subsystems.end(); it_ss++) {
+
+        // get list of nodes in subsystem
         nodes=it_ss->second->getNodes();
+
+        // generate string to identify subsystem and add to tree view
+        std::ostringstream oss;
+        oss << "Subsystem: " << it_ss->second->getId() << ", \"" << it_ss->second->getName() << "\"";
         QList<QStandardItem *> subsysRow;
-        subsysRow << new QStandardItem("Subsystem:");
-        subsysRow << new QStandardItem(QString::number(it_ss->second->getId()));
-        QString str = QString::fromUtf8(it_ss->second->getName().c_str());
-        subsysRow << new QStandardItem(str);
+        subsysRow << new QStandardItem(QString::fromStdString(oss.str()));
         prevItem->appendRow(subsysRow);
+
+        // loop through all nodes in subsystem
         for (it_node it_n = nodes.begin(); it_n!=nodes.end(); it_n++) {
+
+            // get list of components in current node
             components=it_n->second->getComponents();
+
+            // generate string to identify subsystem and add to tree view
+            std::ostringstream oss;
+            oss << "Node: " << it_n->second->getId() << ", \"" << it_n->second->getName() << "\"";
             QList<QStandardItem *> nodeRow;
-            nodeRow << new QStandardItem("Node:");
-            nodeRow << new QStandardItem(QString::number(it_n->second->getId()));
-            nodeRow << new QStandardItem(QString::fromUtf8(it_n->second->getName().c_str()));
+            nodeRow << new QStandardItem(QString::fromStdString((oss.str())));
             subsysRow[0]->appendRow(nodeRow);
+
+            // loop through all components in node
             for (it_comp it_c = components.begin(); it_c!=components.end(); it_c++) {
+
+                // generate string to identify subsystem and add to tree view
+                std::ostringstream oss;
+                oss << "Component: " << it_c->second->getId() << ", \"" << it_c->second->getName() << "\"";
                 QList<QStandardItem *> compRow;
-                compRow << new QStandardItem("Comp:");
-                compRow << new QStandardItem(QString::number(it_c->second->getId()));
-                compRow << new QStandardItem(QString::fromUtf8(it_c->second->getName().c_str()));
+                compRow << new QStandardItem(QString::fromStdString(oss.str()));
                 nodeRow[0]->appendRow(compRow);
+
+                // get list of services supported by current node
                 services = it_c->second->getServices();
+                // loop through list of services and add to tree view
                 for (it_serv it_s = services.begin(); it_s!=services.end(); it_s++) {
                     QList<QStandardItem *> servRow;
-                    servRow << new QStandardItem("");
-                    servRow << new QStandardItem("");
-                    servRow << new QStandardItem(QString::fromUtf8(it_s->second->toString().c_str()));
+                    QString servList = QString::fromStdString(it_s->second->toString().c_str());
+                    servRow << new QStandardItem(servList.replace(QString("\n"),QString("")));
                     compRow[0]->appendRow(servRow);
                 }
             }
