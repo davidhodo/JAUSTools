@@ -25,9 +25,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     JAUSComponent->addMessageCallback(&MainWindow::processReportGlobalPose, this);
 
-    qRegisterMetaType<openjaus::mobility::ReportGlobalPose>("openjaus::mobility::ReportGlobalPose&");
+    //qRegisterMetaType<openjaus::mobility::ReportGlobalPose>("openjaus::mobility::ReportGlobalPose&");
     this->connect(this,SIGNAL(globalPoseChanged(openjaus::mobility::ReportGlobalPose&)),this,SLOT(setGlobalPose(openjaus::mobility::ReportGlobalPose&)));
-
+    qRegisterMetaType<openjaus::mobility::ReportGlobalPose>("openjaus::mobility::ReportGlobalPose&");
      //emit globalPoseChanged(curGlobalPose);
 }
 
@@ -143,7 +143,7 @@ void MainWindow::on_btnQueryGpos_clicked()
 }
 
 bool MainWindow::processReportGlobalPose(openjaus::mobility::ReportGlobalPose &report) {
-    std::cout << std::endl << "Callback called" << std::endl;
+    std::cout << "Callback called" << std::endl;
     //std::cout << "Latitude: " << report.getLatitude_deg() << std::endl;
     //ui->txtLatitude->setText(QString::number(report.getLatitude_deg()));
     //ui->txtLongitude->setText(QString::number(32.390));
