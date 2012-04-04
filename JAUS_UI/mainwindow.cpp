@@ -9,14 +9,22 @@
 #include <openjaus/model/SystemTree.h>
 #include <openjaus/model/Subsystem.h>
 
+void processControlResponse(const openjaus::model::ControlResponse& response) {
+    std::cout << "Recv Control Request Response from: " << response.getAddress() << std::endl;
+    std::cout << "Response code: " << response.getResponseType() << std::endl;
+}
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
+    gposSubscriptionId=0;
+
     // set up text box to display console output
-    //qout = new QDebugStream(std::cout, ui->txtConsoleOutput);
+    qout = new QDebugStream(std::cout, ui->txtConsoleOutput);
 
     // set up JAUS components
     JAUSComponent = new openjaus::core::Base;
@@ -25,10 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     JAUSComponent->addMessageCallback(&MainWindow::processReportGlobalPose, this);
 
-    //qRegisterMetaType<openjaus::mobility::ReportGlobalPose>("openjaus::mobility::ReportGlobalPose&");
     this->connect(this,SIGNAL(globalPoseChanged(openjaus::mobility::ReportGlobalPose&)),this,SLOT(setGlobalPose(openjaus::mobility::ReportGlobalPose&)));
     qRegisterMetaType<openjaus::mobility::ReportGlobalPose>("openjaus::mobility::ReportGlobalPose&");
-     //emit globalPoseChanged(curGlobalPose);
 }
 
 
@@ -55,14 +61,6 @@ void MainWindow::on_pbQueryServices_clicked()
     typedef std::map<std::string, openjaus::model::Service * >::iterator it_serv;
 
     QStandardItemModel *standardModel = new QStandardItemModel ;
-
-
-        //QList<QStandardItem *> secondRow;
-        //secondRow << new QStandardItem("111");
-        //secondRow << new QStandardItem("222");
-        //secondRow << new QStandardItem("333");
-        // adding a row to an item starts a subtree
-        //preparedRow.first()->appendRow(secondRow);
 
     QStandardItem *prevItem = standardModel->invisibleRootItem();
 
@@ -128,6 +126,12 @@ void MainWindow::on_btnFindGPOS_clicked()
         ui->cboGposAddress->insertItem(i,QString::fromStdString(gposList.at(i).toString()));
     }
 
+    if (gposList.size()>0) {
+        ui->btnQueryGpos->setEnabled(true);
+    } else {
+        ui->btnQueryGpos->setEnabled(false);
+    }
+
 }
 
 void MainWindow::on_btnQueryGpos_clicked()
@@ -135,24 +139,49 @@ void MainWindow::on_btnQueryGpos_clicked()
     // send query to currently selected GPOS sensor
     openjaus::mobility::QueryGlobalPose *query = new openjaus::mobility::QueryGlobalPose();
     query->setQueryPresenceVector(65535);
-    //std::cout << ui->cboGposAddress->currentIndex() << std::endl;
-    //std::cout << gposList.at(ui->cboGposAddress->currentIndex()) <<std::endl;
-    // TODO: check index out of bounds on gposlist
-    query->setDestination(gposList.at(ui->cboGposAddress->currentIndex()));
-    JAUSComponent->sendMessage(query);
+
+    double rate = ui->txtGposRate->text().toDouble();
+
+    if (gposList.size()<0)
+        return;
+
+    openjaus::transport::Address gposAddress = gposList.at(ui->cboGposAddress->currentIndex());
+
+    // if the interval is 0, just send a single query, if not set up a periodic event
+    if(!gposSubscriptionId && rate > 0)
+    {
+        gposSubscriptionId = JAUSComponent->subscribePeriodic(gposAddress, query, rate);
+        std::cout << "Created Periodic Event: " << gposSubscriptionId << std::endl;
+    } else if (rate >0) {
+        std::cout << "Periodic event already exists" << gposSubscriptionId << std::endl;
+    } else {
+        query->setDestination(gposAddress);
+        JAUSComponent->sendMessage(query);
+    }
+
+    if (gposSubscriptionId)
+        ui->btnUnsubscribeGpos->setEnabled(true);
+    else
+        ui->btnUnsubscribeGpos->setEnabled(false);
+}
+
+void MainWindow::on_btnUnsubscribeGpos_clicked()
+{
+    if (gposSubscriptionId!=0){
+        std::cout << "Un-subscribing Periodic Event" << std::endl;
+        if(JAUSComponent->unsubscribe(gposSubscriptionId))
+        {
+            gposSubscriptionId = 0;
+            ui->btnUnsubscribeGpos->setEnabled(false);
+        }
+    }
 }
 
 bool MainWindow::processReportGlobalPose(openjaus::mobility::ReportGlobalPose &report) {
-    std::cout << "Callback called" << std::endl;
-    //std::cout << "Latitude: " << report.getLatitude_deg() << std::endl;
-    //ui->txtLatitude->setText(QString::number(report.getLatitude_deg()));
-    //ui->txtLongitude->setText(QString::number(32.390));
-    //ui->txtAltitude->setText("Test");
     emit globalPoseChanged(report);
 }
 
 void MainWindow::setGlobalPose(openjaus::mobility::ReportGlobalPose &newPose) {
-    std::cout << "Slot called" << std::endl;
     ui->txtLatitude->setText(QString::number(newPose.getLatitude_deg()));
     ui->txtLongitude->setText(QString::number(newPose.getLongitude_deg()));
     ui->txtAltitude->setText(QString::number(newPose.getAltitude_m()));
@@ -161,3 +190,116 @@ void MainWindow::setGlobalPose(openjaus::mobility::ReportGlobalPose &newPose) {
     ui->txtYaw->setText(QString::number(newPose.getYaw_rad()));
 }
 
+
+
+void MainWindow::on_btnFindPrimDriver_clicked()
+{
+    // find list of global pose sensors
+    primDriverList = JAUSComponent->getSystemTree()->lookupService("urn:jaus:jss:mobility:PrimitiveDriver");
+
+    for(size_t i = 0; i < primDriverList.size(); i++)
+    {
+        ui->cboPrimDriverAddress->insertItem(i,QString::fromStdString(primDriverList.at(i).toString()));
+    }
+
+}
+
+void MainWindow::on_btnSendPrimDriver_clicked()
+{
+
+    if (primDriverList.size()<0)
+        return;
+
+    openjaus::transport::Address primDriverAddress = primDriverList.at(ui->cboPrimDriverAddress->currentIndex());
+
+    openjaus::mobility::SetWrenchEffort *cmd=new openjaus::mobility::SetWrenchEffort;
+    cmd->setDestination(primDriverAddress);
+
+    // set up presence vector
+    cmd->setPresenceVector(0);
+
+    if (ui->chkLinX->isChecked()) {
+        cmd->enablePropulsiveLinearEffortX();
+        cmd->setPropulsiveLinearEffortX_percent(ui->txtLinX->text().toDouble());
+    }
+    else
+        cmd->disablePropulsiveLinearEffortX();
+
+    if (ui->chkLinY->isChecked()) {
+        cmd->enablePropulsiveLinearEffortY();
+        cmd->setPropulsiveLinearEffortY_percent(ui->txtLinY->text().toDouble());
+    }
+    else
+        cmd->disablePropulsiveLinearEffortY();
+
+    if (ui->chkLinZ->isChecked()) {
+        cmd->enablePropulsiveLinearEffortZ();
+        cmd->setPropulsiveLinearEffortZ_percent(ui->txtLinZ->text().toDouble());
+    }
+    else
+        cmd->disablePropulsiveLinearEffortZ();
+
+
+    if (ui->chkRotX->isChecked()) {
+        cmd->enablePropulsiveRotationalEffortX();
+        cmd->setPropulsiveRotationalEffortX_percent(ui->txtRotX->text().toDouble());
+    }
+    else
+        cmd->disablePropulsiveRotationalEffortX();
+
+    if (ui->chkRotY->isChecked()) {
+        cmd->enablePropulsiveRotationalEffortY();
+        cmd->setPropulsiveRotationalEffortY_percent(ui->txtRotY->text().toDouble());
+    }
+    else
+        cmd->disablePropulsiveRotationalEffortY();
+
+    if (ui->chkRotZ->isChecked()) {
+        cmd->enablePropulsiveRotationalEffortZ();
+        cmd->setPropulsiveRotationalEffortZ_percent(ui->txtRotZ->text().toDouble());
+    }
+    else
+        cmd->disablePropulsiveRotationalEffortZ();
+
+    JAUSComponent->sendMessage(cmd);
+}
+
+void MainWindow::on_btnRequestPrimDrivControl_clicked()
+{
+    if (primDriverList.size()<0)
+        return;
+
+    openjaus::transport::Address primDriverAddress = primDriverList.at(ui->cboPrimDriverAddress->currentIndex());
+
+    std::cout << "Request Control of Primitive Driver at " << primDriverAddress << std::endl;
+    JAUSComponent->requestControl(primDriverAddress, processControlResponse);
+}
+
+
+void MainWindow::on_btnReleasePrimDrivControl_clicked()
+{
+    if (primDriverList.size()<0)
+        return;
+
+    openjaus::transport::Address primDriverAddress = primDriverList.at(ui->cboPrimDriverAddress->currentIndex());
+
+    try {
+        JAUSComponent->releaseControl(primDriverAddress);
+        std::cout << "Release Control of Primitive Driver at " << primDriverAddress << std::endl;
+
+    } catch (std::exception &e) {
+
+    }
+}
+
+void MainWindow::on_btnResumePrimDriver_clicked()
+{
+    if (primDriverList.size()<0)
+        return;
+
+    openjaus::transport::Address primDriverAddress = primDriverList.at(ui->cboPrimDriverAddress->currentIndex());
+
+    openjaus::core::Resume *res = new openjaus::core::Resume;
+    res->setDestination(primDriverAddress);
+    JAUSComponent->sendMessage(res);
+}

@@ -63,6 +63,9 @@
       </rect>
      </property>
     </widget>
+    <zorder>pbQueryServices</zorder>
+    <zorder>treeServices</zorder>
+    <zorder>btnUnsubscribeGpos</zorder>
    </widget>
    <widget class="QTextEdit" name="txtConsoleOutput">
     <property name="geometry">
@@ -117,10 +120,13 @@
        <string>GPOS</string>
       </attribute>
       <widget class="QPushButton" name="btnQueryGpos">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
-         <x>270</x>
-         <y>80</y>
+         <x>250</x>
+         <y>70</y>
          <width>97</width>
          <height>27</height>
         </rect>
@@ -129,7 +135,7 @@
         <string>Query</string>
        </property>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>12</x>
@@ -162,7 +168,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -234,6 +240,48 @@
         </item>
        </layout>
       </widget>
+      <widget class="QLineEdit" name="txtGposRate">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>130</y>
+         <width>113</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0.0</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_8">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>110</y>
+         <width>101</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Interval (Hz):</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnUnsubscribeGpos">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>170</y>
+         <width>97</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Unsubscribe</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
@@ -249,6 +297,237 @@
       <attribute name="title">
        <string>PrimDriver</string>
       </attribute>
+      <widget class="QWidget" name="layoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>411</width>
+         <height>29</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Address:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cboPrimDriverAddress">
+          <property name="currentIndex">
+           <number>-1</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnFindPrimDriver">
+          <property name="text">
+           <string>Find</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QPushButton" name="btnSendPrimDriver">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>260</y>
+         <width>97</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Send</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnRequestPrimDrivControl">
+       <property name="geometry">
+        <rect>
+         <x>116</x>
+         <y>260</y>
+         <width>131</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Request Control</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnReleasePrimDrivControl">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>260</y>
+         <width>131</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Release Control</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnQueryPrimDriver">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>300</y>
+         <width>97</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Query</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnResumePrimDriver">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>300</y>
+         <width>97</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Resume</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chkJoystickPrimDriver">
+       <property name="geometry">
+        <rect>
+         <x>270</x>
+         <y>300</y>
+         <width>97</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Joystick</string>
+       </property>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>8</x>
+         <y>52</y>
+         <width>311</width>
+         <height>194</height>
+        </rect>
+       </property>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="chkLinX">
+          <property name="text">
+           <string>Linear Effort X (%):</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="txtLinX">
+          <property name="text">
+           <string>0.0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="chkLinY">
+          <property name="text">
+           <string>Linear Effort Y (%):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="txtLinY">
+          <property name="text">
+           <string>0.0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QCheckBox" name="chkLinZ">
+          <property name="text">
+           <string>Linear Effort Z (%):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="txtLinZ">
+          <property name="text">
+           <string>0.0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="chkRotX">
+          <property name="text">
+           <string>Rotational Effort X (%):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="txtRotX">
+          <property name="text">
+           <string>0.0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QCheckBox" name="chkRotY">
+          <property name="text">
+           <string>Rotational Effort Y (%):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="txtRotY">
+          <property name="text">
+           <string>0.0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QCheckBox" name="chkRotZ">
+          <property name="text">
+           <string>Rotational Effort Z (%):</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="txtRotZ">
+          <property name="text">
+           <string>0.0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
@@ -262,7 +541,7 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>0</x>
