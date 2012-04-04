@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>849</width>
-    <height>585</height>
+    <width>953</width>
+    <height>648</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
-      <width>431</width>
-      <height>361</height>
+      <y>0</y>
+      <width>461</width>
+      <height>401</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -43,8 +43,8 @@
     <widget class="QPushButton" name="pbQueryServices">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>320</y>
+       <x>160</x>
+       <y>360</y>
        <width>121</width>
        <height>27</height>
       </rect>
@@ -53,36 +53,13 @@
       <string>Query Services</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="btnLookupService">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>320</y>
-       <width>121</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Lookup Service</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>320</y>
-       <width>151</width>
-       <height>27</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QTreeView" name="treeServices">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>411</width>
-       <height>291</height>
+       <width>441</width>
+       <height>331</height>
       </rect>
      </property>
     </widget>
@@ -90,68 +67,211 @@
    <widget class="QTextEdit" name="txtConsoleOutput">
     <property name="geometry">
      <rect>
+      <x>10</x>
+      <y>410</y>
+      <width>931</width>
+      <height>171</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>0</y>
+      <width>461</width>
+      <height>401</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QGroupBox {
+     border: 2px solid gray;
+     border-radius: 5px;
+     margin-top: 1ex; /* leave space at the top for the title */
+ }
+
+ QGroupBox::title {
+     subcontrol-origin: margin;
+     subcontrol-position: top center; /* position at the top center */
+     padding: 0 3px;
+
+ }</string>
+    </property>
+    <property name="title">
+     <string>Service Functions</string>
+    </property>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>441</width>
+       <height>371</height>
+      </rect>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>GPOS</string>
+      </attribute>
+      <widget class="QPushButton" name="btnQueryGpos">
+       <property name="geometry">
+        <rect>
+         <x>270</x>
+         <y>80</y>
+         <width>97</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Query</string>
+       </property>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>12</x>
+         <y>21</y>
+         <width>411</width>
+         <height>29</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Address:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cboGposAddress">
+          <property name="currentIndex">
+           <number>-1</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnFindGPOS">
+          <property name="text">
+           <string>Find</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>231</width>
+         <height>201</height>
+        </rect>
+       </property>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Latitude</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="txtLatitude"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Longitude</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="txtLongitude"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Altitude</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="txtAltitude"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Roll</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="txtRoll"/>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Pitch</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="txtPitch"/>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Yaw</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="txtYaw"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_4">
+      <attribute name="title">
+       <string>VelSensor</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tab_5">
+      <attribute name="title">
+       <string>AccelSensor</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>PrimDriver</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>VelDriver</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tab_6">
+      <attribute name="title">
+       <string>Video</string>
+      </attribute>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
       <x>0</x>
-      <y>380</y>
-      <width>841</width>
-      <height>141</height>
+      <y>0</y>
+      <width>2</width>
+      <height>2</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>440</x>
-      <y>10</y>
-      <width>97</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
-    </property>
-   </widget>
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>40</y>
-      <width>391</width>
-      <height>331</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="tab">
-     <attribute name="title">
-      <string>GPOS</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_4">
-     <attribute name="title">
-      <string>VelSensor</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_5">
-     <attribute name="title">
-      <string>AccelSensor</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>PrimDriver</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_3">
-     <attribute name="title">
-      <string>VelDriver</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_6">
-     <attribute name="title">
-      <string>Video</string>
-     </attribute>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2"/>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -159,7 +279,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>849</width>
+     <width>953</width>
      <height>25</height>
     </rect>
    </property>

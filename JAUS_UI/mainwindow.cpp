@@ -16,34 +16,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // set up text box to display console output
-    qout = new QDebugStream(std::cout, ui->txtConsoleOutput);
+    //qout = new QDebugStream(std::cout, ui->txtConsoleOutput);
 
     // set up JAUS components
     JAUSComponent = new openjaus::core::Base;
     JAUSComponent->setName("JAUS_UI");
     JAUSComponent->run();
 
-    /*QStandardItemModel *standardModel = new QStandardItemModel ;
+    JAUSComponent->addMessageCallback(&MainWindow::processReportGlobalPose, this);
 
-    QList<QStandardItem *> preparedRow;
-    preparedRow << new QStandardItem("first");
-    preparedRow << new QStandardItem("second");
-    preparedRow << new QStandardItem("third");
-    QStandardItem *item = standardModel->invisibleRootItem();
-    // adding a row to the invisible root item produces a root element
-    item->appendRow(preparedRow);
+    qRegisterMetaType<openjaus::mobility::ReportGlobalPose>("openjaus::mobility::ReportGlobalPose&");
+    this->connect(this,SIGNAL(globalPoseChanged(openjaus::mobility::ReportGlobalPose&)),this,SLOT(setGlobalPose(openjaus::mobility::ReportGlobalPose&)));
 
-    QList<QStandardItem *> secondRow;
-    secondRow << new QStandardItem("111");
-    secondRow << new QStandardItem("222");
-    secondRow << new QStandardItem("333");
-    // adding a row to an item starts a subtree
-    preparedRow.first()->appendRow(secondRow);
-
-
-    ui->treeServices->setModel(standardModel);
-    ui->treeServices->expandAll();*/
-
+     //emit globalPoseChanged(curGlobalPose);
 }
 
 
@@ -52,11 +37,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    std::cout << "test output" << std::endl;
-    std::cout << JAUSComponent->getSystemTree()->toString();
-}
 
 void MainWindow::on_pbQueryServices_clicked()
 {
@@ -136,6 +116,48 @@ void MainWindow::on_pbQueryServices_clicked()
 
     ui->treeServices->setModel(standardModel);
     ui->treeServices->expandAll();
+}
 
+void MainWindow::on_btnFindGPOS_clicked()
+{
+    // find list of global pose sensors
+    gposList = JAUSComponent->getSystemTree()->lookupService("urn:jaus:jss:mobility:GlobalPoseSensor");
+
+    for(size_t i = 0; i < gposList.size(); i++)
+    {
+        ui->cboGposAddress->insertItem(i,QString::fromStdString(gposList.at(i).toString()));
+    }
 
 }
+
+void MainWindow::on_btnQueryGpos_clicked()
+{
+    // send query to currently selected GPOS sensor
+    openjaus::mobility::QueryGlobalPose *query = new openjaus::mobility::QueryGlobalPose();
+    query->setQueryPresenceVector(65535);
+    //std::cout << ui->cboGposAddress->currentIndex() << std::endl;
+    //std::cout << gposList.at(ui->cboGposAddress->currentIndex()) <<std::endl;
+    // TODO: check index out of bounds on gposlist
+    query->setDestination(gposList.at(ui->cboGposAddress->currentIndex()));
+    JAUSComponent->sendMessage(query);
+}
+
+bool MainWindow::processReportGlobalPose(openjaus::mobility::ReportGlobalPose &report) {
+    std::cout << std::endl << "Callback called" << std::endl;
+    //std::cout << "Latitude: " << report.getLatitude_deg() << std::endl;
+    //ui->txtLatitude->setText(QString::number(report.getLatitude_deg()));
+    //ui->txtLongitude->setText(QString::number(32.390));
+    //ui->txtAltitude->setText("Test");
+    emit globalPoseChanged(report);
+}
+
+void MainWindow::setGlobalPose(openjaus::mobility::ReportGlobalPose &newPose) {
+    std::cout << "Slot called" << std::endl;
+    ui->txtLatitude->setText(QString::number(newPose.getLatitude_deg()));
+    ui->txtLongitude->setText(QString::number(newPose.getLongitude_deg()));
+    ui->txtAltitude->setText(QString::number(newPose.getAltitude_m()));
+    ui->txtPitch->setText(QString::number(newPose.getPitch_rad()));
+    ui->txtRoll->setText(QString::number(newPose.getRoll_rad()));
+    ui->txtYaw->setText(QString::number(newPose.getYaw_rad()));
+}
+
