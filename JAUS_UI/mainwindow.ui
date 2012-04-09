@@ -63,9 +63,6 @@
       </rect>
      </property>
     </widget>
-    <zorder>pbQueryServices</zorder>
-    <zorder>treeServices</zorder>
-    <zorder>btnUnsubscribeGpos</zorder>
    </widget>
    <widget class="QTextEdit" name="txtConsoleOutput">
     <property name="geometry">
@@ -113,7 +110,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -398,8 +395,8 @@
       <widget class="QCheckBox" name="chkJoystickPrimDriver">
        <property name="geometry">
         <rect>
-         <x>270</x>
-         <y>300</y>
+         <x>290</x>
+         <y>220</y>
          <width>97</width>
          <height>22</height>
         </rect>
@@ -408,12 +405,12 @@
         <string>Joystick</string>
        </property>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>8</x>
          <y>52</y>
-         <width>311</width>
+         <width>271</width>
          <height>194</height>
         </rect>
        </property>
@@ -527,6 +524,84 @@
          </widget>
         </item>
        </layout>
+      </widget>
+      <widget class="QLineEdit" name="txtJoyDevice">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>70</y>
+         <width>113</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>/dev/input/js0</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_10">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>50</y>
+         <width>101</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Device name:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_11">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>110</y>
+         <width>101</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>X Scale Factor:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="txtJoyXScale">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>130</y>
+         <width>113</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>1</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_12">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>160</y>
+         <width>101</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Y Scale Factor:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="txtJoyYScale">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>180</y>
+         <width>113</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>1</string>
+       </property>
       </widget>
      </widget>
      <widget class="QWidget" name="tab_3">

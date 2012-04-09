@@ -22,11 +22,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     gposSubscriptionId=0;
+    stickInited=false;
 
     // set up text box to display console output
-    qout = new QDebugStream(std::cout, ui->txtConsoleOutput);
+    //qout = new QDebugStream(std::cout, ui->txtConsoleOutput);
 
     // set up JAUS components
+    openjaus::system::Application::setVerboseMode();
     JAUSComponent = new openjaus::core::Base;
     JAUSComponent->setName("JAUS_UI");
     JAUSComponent->run();
@@ -35,6 +37,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->connect(this,SIGNAL(globalPoseChanged(openjaus::mobility::ReportGlobalPose&)),this,SLOT(setGlobalPose(openjaus::mobility::ReportGlobalPose&)));
     qRegisterMetaType<openjaus::mobility::ReportGlobalPose>("openjaus::mobility::ReportGlobalPose&");
+
+    connect(this,SIGNAL(setLinX(QString)),ui->txtLinX,SLOT(setText(QString)));
+    connect(this,SIGNAL(setRotZ(QString)),ui->txtRotZ,SLOT(setText(QString)));
+
+    // do initial query for services
+    on_pbQueryServices_clicked();
 }
 
 
@@ -302,4 +310,62 @@ void MainWindow::on_btnResumePrimDriver_clicked()
     openjaus::core::Resume *res = new openjaus::core::Resume;
     res->setDestination(primDriverAddress);
     JAUSComponent->sendMessage(res);
+}
+
+void MainWindow::on_chkJoystickPrimDriver_stateChanged(int arg1)
+{
+    if (ui->chkJoystickPrimDriver->isChecked()) {
+        // connect to the joystick
+        // TODO: modify joystick code to allow device to be specified
+        stickInited=stick.init();
+        // start timer to read from stick
+        joystickTimer = new QTimer(this);
+        connect(joystickTimer, SIGNAL(timeout()),this,SLOT(readJoystick()));
+        joystickTimer->start(100);
+        std::cout << "joystick timer started: " << joystickTimer->isActive() << std::endl;
+    } else {
+        joystickTimer->stop();
+        stick.close();
+        stickInited=false;
+        std::cout << "joystick timer stopped: " << joystickTimer->isActive() << std::endl;
+    }
+}
+
+
+void MainWindow::readJoystick() {
+
+    if (primDriverList.size()<0)
+        return;
+
+    openjaus::transport::Address primDriverAddress = primDriverList.at(ui->cboPrimDriverAddress->currentIndex());
+    openjaus::mobility::SetWrenchEffort *cmd=new openjaus::mobility::SetWrenchEffort;
+    cmd->setPresenceVector(0);
+    cmd->enablePropulsiveLinearEffortX();
+    cmd->enablePropulsiveRotationalEffortZ();
+    cmd->setDestination(primDriverAddress);
+
+    try {
+        // read joystick
+        if (stick.GetStatus(curStatus)) {
+                cmd->setPropulsiveLinearEffortX_percent(-(double)curStatus.y/32768.0);
+                cmd->setPropulsiveRotationalEffortZ_percent((double)curStatus.x/32768.0);
+        }
+        else {
+                // stick is not responding. send 0's to vehicle
+                std::cout << "Stick not responding." << std::endl;
+                cmd->setPropulsiveLinearEffortX_percent(0);
+                cmd->setPropulsiveRotationalEffortZ_percent(0);
+        }
+        emit setLinX(QString::number(cmd->getPropulsiveLinearEffortX_percent()));
+        emit setRotZ(QString::number(cmd->getPropulsiveRotationalEffortZ_percent()));
+        JAUSComponent->sendMessage(cmd);
+    } catch (std::exception &e) {
+        std::cout << "Error reading joystick and sending ." << std::endl;
+    }
+
+}
+
+void MainWindow::on_chkJoystickPrimDriver_clicked()
+{
+
 }

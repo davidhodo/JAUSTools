@@ -11,10 +11,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    joystick.cpp
 
 HEADERS  += mainwindow.h \
-    qdebugstream.h
+    qdebugstream.h \
+    joystick.h
 
 FORMS    += mainwindow.ui
 

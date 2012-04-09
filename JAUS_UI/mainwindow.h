@@ -2,11 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
 #include "qdebugstream.h"
 #include <openjaus.h>
 #include <openjaus/core/Base.h>
 #include <openjaus/mobility/GlobalPoseSensor.h>
 #include <openjaus/mobility/PrimitiveDriver.h>
+#include "joystick.h"
 
 #include <map>
 #include <vector>
@@ -25,6 +27,8 @@ public:
 
 signals:
     void globalPoseChanged(openjaus::mobility::ReportGlobalPose &pose);
+    void setLinX(const QString &);
+    void setRotZ(const QString &);
 
 public slots:
     void on_pbQueryServices_clicked();
@@ -48,6 +52,12 @@ private slots:
 
     void on_btnResumePrimDriver_clicked();
 
+    void on_chkJoystickPrimDriver_clicked();
+
+    void on_chkJoystickPrimDriver_stateChanged(int arg1);
+
+    void readJoystick();
+
 private:
     Ui::MainWindow *ui;
     QDebugStream *qout;
@@ -66,7 +76,13 @@ private:
 
 
     openjaus::mobility::ReportGlobalPose curGlobalPose;
-    openjaus::mobility::SetWrenchEffort *curWrenchEffort;
+
+    // joystick members and methods
+    Joystick stick;  //!< joystick object
+    bool stickInited;	//!< indicates if the joystick has been successfully initialized
+    JoystickStatus curStatus;	//!< last read joystick status
+    QTimer *joystickTimer;
+
 
 };
 
