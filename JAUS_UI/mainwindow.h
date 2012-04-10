@@ -58,6 +58,8 @@ private slots:
 
     void readJoystick();
 
+    void on_btnQueryControl_clicked();
+
 private:
     Ui::MainWindow *ui;
     QDebugStream *qout;
@@ -72,6 +74,8 @@ private:
 
     // new JAUS data callback methods
     bool processReportGlobalPose(openjaus::mobility::ReportGlobalPose &report);
+    bool processQueryControl(openjaus::core::ReportControl& report);
+
     //void processControlResponse(const openjaus::model::ControlResponse& response);
 
 

@@ -14,6 +14,11 @@ void processControlResponse(const openjaus::model::ControlResponse& response) {
     std::cout << "Response code: " << response.getResponseType() << std::endl;
 }
 
+bool MainWindow::processQueryControl(openjaus::core::ReportControl& report) {
+    std::cout << "Received query control response from: " << report.getSource() << std::endl;
+    std::cout << "Controlled by: " << report.getComponentID() << std::endl;
+    return true;
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -34,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     JAUSComponent->run();
 
     JAUSComponent->addMessageCallback(&MainWindow::processReportGlobalPose, this);
+    JAUSComponent->addMessageCallback(&MainWindow::processQueryControl, this);
 
     this->connect(this,SIGNAL(globalPoseChanged(openjaus::mobility::ReportGlobalPose&)),this,SLOT(setGlobalPose(openjaus::mobility::ReportGlobalPose&)));
     qRegisterMetaType<openjaus::mobility::ReportGlobalPose>("openjaus::mobility::ReportGlobalPose&");
@@ -368,4 +374,16 @@ void MainWindow::readJoystick() {
 void MainWindow::on_chkJoystickPrimDriver_clicked()
 {
 
+}
+
+void MainWindow::on_btnQueryControl_clicked()
+{
+    if (primDriverList.size()<0)
+        return;
+
+    openjaus::transport::Address primDriverAddress = primDriverList.at(ui->cboPrimDriverAddress->currentIndex());
+
+    std::cout << "Query Control of Primitive Driver at " << primDriverAddress << std::endl;
+    openjaus::core::QueryControl *qry = new openjaus::core::QueryControl();
+    qry->setDestination(primDriverAddress);
 }
