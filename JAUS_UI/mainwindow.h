@@ -29,6 +29,8 @@ signals:
     void globalPoseChanged(openjaus::mobility::ReportGlobalPose &pose);
     void setLinX(const QString &);
     void setRotZ(const QString &);
+    void setControlledBy(const QString &);
+    void setStatus(const QString &);
 
 public slots:
     void on_pbQueryServices_clicked();
@@ -46,12 +48,6 @@ private slots:
 
     void on_btnSendPrimDriver_clicked();
 
-    void on_btnRequestPrimDrivControl_clicked();
-
-    void on_btnReleasePrimDrivControl_clicked();
-
-    void on_btnResumePrimDriver_clicked();
-
     void on_chkJoystickPrimDriver_clicked();
 
     void on_chkJoystickPrimDriver_stateChanged(int arg1);
@@ -59,6 +55,28 @@ private slots:
     void readJoystick();
 
     void on_btnQueryControl_clicked();
+
+    void on_btnFindAccessControl_clicked();
+
+    void on_btnFindManagement_clicked();
+
+    void on_btnQueryManagementStatus_clicked();
+
+    void on_btnRequestControl_clicked();
+
+    void on_btnReleaseControl_clicked();
+
+    void on_btnResume_clicked();
+
+    void on_btnShutdown_clicked();
+
+    void on_btnStandby_clicked();
+
+    void on_btnReset_clicked();
+
+    void on_btnSetEmergency_clicked();
+
+    void on_btnClearEmergency_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -71,10 +89,14 @@ private:
     std::vector<openjaus::transport::Address> gposList;
     std::vector<openjaus::transport::Address> primDriverList;
     std::vector<openjaus::transport::Address> velDriverList;
+    std::vector<openjaus::transport::Address> accessControlList;
+    std::vector<openjaus::transport::Address> managementList;
+
 
     // new JAUS data callback methods
     bool processReportGlobalPose(openjaus::mobility::ReportGlobalPose &report);
-    bool processQueryControl(openjaus::core::ReportControl& report);
+    bool processReportControl(openjaus::core::ReportControl& report);
+    bool processReportStatus(openjaus::core::ReportStatus& report);
 
     //void processControlResponse(const openjaus::model::ControlResponse& response);
 

@@ -14,10 +14,44 @@ void processControlResponse(const openjaus::model::ControlResponse& response) {
     std::cout << "Response code: " << response.getResponseType() << std::endl;
 }
 
-bool MainWindow::processQueryControl(openjaus::core::ReportControl& report) {
-    std::cout << "Received query control response from: " << report.getSource() << std::endl;
-    std::cout << "Controlled by: " << report.getComponentID() << std::endl;
+bool MainWindow::processReportControl(openjaus::core::ReportControl& report) {
+    std::cout << "Received report control response from: " << report.getSource() << std::endl;
+    std::ostringstream oss;
+    oss << static_cast<unsigned short>(report.getSubsystemID()) <<
+           "." << static_cast<unsigned int>(report.getNodeID()) << "."
+        << static_cast<unsigned int>(report.getComponentID());
+    emit setControlledBy(QString::fromStdString(oss.str()));
+    std::cout << "Controlled by JAUS Address: "  << oss.str() << std::endl;
+
     return true;
+}
+
+bool MainWindow::processReportStatus(openjaus::core::ReportStatus &report) {
+    std::cout << "Received report status response from: " << report.getSource() << std::endl;
+    QString status;
+    switch (report.getStatus()) {
+    case 0:
+        status = "Init";
+        break;
+    case 1:
+        status = "Ready";
+        break;
+    case 2:
+        status = "Standby";
+        break;
+    case 3:
+        status = "Shutdown";
+        break;
+    case 4:
+        status = "Failure";
+        break;
+    case 5:
+        status = "Emergency";
+        break;
+    }
+
+    std::cout << "State is: " << status.toStdString() << std::endl;
+    emit setStatus(status);
 }
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -30,22 +64,25 @@ MainWindow::MainWindow(QWidget *parent) :
     stickInited=false;
 
     // set up text box to display console output
-    //qout = new QDebugStream(std::cout, ui->txtConsoleOutput);
+    qout = new QDebugStream(std::cout, ui->txtConsoleOutput);
 
     // set up JAUS components
-    openjaus::system::Application::setVerboseMode();
+    //openjaus::system::Application::setVerboseMode();
     JAUSComponent = new openjaus::core::Base;
     JAUSComponent->setName("JAUS_UI");
     JAUSComponent->run();
 
     JAUSComponent->addMessageCallback(&MainWindow::processReportGlobalPose, this);
-    JAUSComponent->addMessageCallback(&MainWindow::processQueryControl, this);
+    JAUSComponent->addMessageCallback(&MainWindow::processReportControl, this);
+    JAUSComponent->addMessageCallback(&MainWindow::processReportStatus, this);
 
     this->connect(this,SIGNAL(globalPoseChanged(openjaus::mobility::ReportGlobalPose&)),this,SLOT(setGlobalPose(openjaus::mobility::ReportGlobalPose&)));
     qRegisterMetaType<openjaus::mobility::ReportGlobalPose>("openjaus::mobility::ReportGlobalPose&");
 
     connect(this,SIGNAL(setLinX(QString)),ui->txtLinX,SLOT(setText(QString)));
     connect(this,SIGNAL(setRotZ(QString)),ui->txtRotZ,SLOT(setText(QString)));
+    connect(this,SIGNAL(setControlledBy(QString)),ui->txtControlledBy,SLOT(setText(QString)));
+    connect(this,SIGNAL(setStatus(QString)),ui->txtManagementStatus,SLOT(setText(QString)));
 
     // do initial query for services
     on_pbQueryServices_clicked();
@@ -278,45 +315,6 @@ void MainWindow::on_btnSendPrimDriver_clicked()
     JAUSComponent->sendMessage(cmd);
 }
 
-void MainWindow::on_btnRequestPrimDrivControl_clicked()
-{
-    if (primDriverList.size()<0)
-        return;
-
-    openjaus::transport::Address primDriverAddress = primDriverList.at(ui->cboPrimDriverAddress->currentIndex());
-
-    std::cout << "Request Control of Primitive Driver at " << primDriverAddress << std::endl;
-    JAUSComponent->requestControl(primDriverAddress, processControlResponse);
-}
-
-
-void MainWindow::on_btnReleasePrimDrivControl_clicked()
-{
-    if (primDriverList.size()<0)
-        return;
-
-    openjaus::transport::Address primDriverAddress = primDriverList.at(ui->cboPrimDriverAddress->currentIndex());
-
-    try {
-        JAUSComponent->releaseControl(primDriverAddress);
-        std::cout << "Release Control of Primitive Driver at " << primDriverAddress << std::endl;
-
-    } catch (std::exception &e) {
-
-    }
-}
-
-void MainWindow::on_btnResumePrimDriver_clicked()
-{
-    if (primDriverList.size()<0)
-        return;
-
-    openjaus::transport::Address primDriverAddress = primDriverList.at(ui->cboPrimDriverAddress->currentIndex());
-
-    openjaus::core::Resume *res = new openjaus::core::Resume;
-    res->setDestination(primDriverAddress);
-    JAUSComponent->sendMessage(res);
-}
 
 void MainWindow::on_chkJoystickPrimDriver_stateChanged(int arg1)
 {
@@ -378,12 +376,151 @@ void MainWindow::on_chkJoystickPrimDriver_clicked()
 
 void MainWindow::on_btnQueryControl_clicked()
 {
-    if (primDriverList.size()<0)
+    if (accessControlList.size()<0)
         return;
 
-    openjaus::transport::Address primDriverAddress = primDriverList.at(ui->cboPrimDriverAddress->currentIndex());
+    openjaus::transport::Address accessControlAddress = accessControlList.at(ui->cboAccessControl->currentIndex());
 
-    std::cout << "Query Control of Primitive Driver at " << primDriverAddress << std::endl;
+    std::cout << "Query Control of Service at " << accessControlAddress << std::endl;
     openjaus::core::QueryControl *qry = new openjaus::core::QueryControl();
-    qry->setDestination(primDriverAddress);
+    qry->setDestination(accessControlAddress);
+    JAUSComponent->sendMessage(qry);
+}
+
+void MainWindow::on_btnFindAccessControl_clicked()
+{
+    // find list of services that inherit from Access Control
+    accessControlList = JAUSComponent->getSystemTree()->lookupService("urn:jaus:jss:core:AccessControl");
+
+    for(size_t i = 0; i < accessControlList.size(); i++)
+    {
+        ui->cboAccessControl->insertItem(i,QString::fromStdString(accessControlList.at(i).toString()));
+    }
+}
+
+void MainWindow::on_btnFindManagement_clicked()
+{
+    // find list of services that inherit from Management
+    managementList = JAUSComponent->getSystemTree()->lookupService("urn:jaus:jss:core:Management");
+
+    for(size_t i = 0; i < managementList.size(); i++)
+    {
+        ui->cboManagement->insertItem(i,QString::fromStdString(managementList.at(i).toString()));
+    }
+}
+
+void MainWindow::on_btnQueryManagementStatus_clicked()
+{
+    if (managementList.size()<0)
+        return;
+
+    openjaus::transport::Address managementAddress = managementList.at(ui->cboManagement->currentIndex());
+
+    std::cout << "Query Status of Service at " << managementAddress << std::endl;
+    openjaus::core::QueryStatus *qry = new openjaus::core::QueryStatus();
+    qry->setDestination(managementAddress);
+    JAUSComponent->sendMessage(qry);
+}
+
+void MainWindow::on_btnRequestControl_clicked()
+{
+    if (accessControlList.size()<0)
+        return;
+
+    openjaus::transport::Address accessControlAddress = accessControlList.at(ui->cboAccessControl->currentIndex());
+
+    std::cout << "Request Control of Service at " << accessControlAddress << std::endl;
+    //openjaus::core::ReleaseControl *cmd = new openjaus::core::ReleaseControl();
+    //JAUSComponent->sendMessage(cmd);
+    JAUSComponent->requestControl(accessControlAddress, processControlResponse);
+}
+
+void MainWindow::on_btnReleaseControl_clicked()
+{
+    if (accessControlList.size()<0)
+        return;
+
+    openjaus::transport::Address accessControlAddress = accessControlList.at(ui->cboAccessControl->currentIndex());
+
+    try {
+        //openjaus::core::RequestControl *cmd = new openjaus::core::RequestControl();
+        //JAUSComponent->sendMessage(cmd);
+        JAUSComponent->releaseControl(accessControlAddress);
+        std::cout << "Release Control of Service at " << accessControlAddress << std::endl;
+
+    } catch (std::exception &e) {
+
+    }
+}
+
+void MainWindow::on_btnResume_clicked()
+{
+    if (managementList.size()<0)
+        return;
+
+    openjaus::transport::Address managementAddress = managementList.at(ui->cboManagement->currentIndex());
+
+    openjaus::core::Resume *res = new openjaus::core::Resume();
+    res->setDestination(managementAddress);
+    JAUSComponent->sendMessage(res);
+}
+
+void MainWindow::on_btnShutdown_clicked()
+{
+    if (managementList.size()<0)
+        return;
+
+    openjaus::transport::Address managementAddress = managementList.at(ui->cboManagement->currentIndex());
+
+    openjaus::core::Shutdown *cmd = new openjaus::core::Shutdown();
+    cmd->setDestination(managementAddress);
+    JAUSComponent->sendMessage(cmd);
+}
+
+void MainWindow::on_btnStandby_clicked()
+{
+    if (managementList.size()<0)
+        return;
+
+    openjaus::transport::Address managementAddress = managementList.at(ui->cboManagement->currentIndex());
+
+    openjaus::core::Standby *cmd = new openjaus::core::Standby();
+    cmd->setDestination(managementAddress);
+    JAUSComponent->sendMessage(cmd);
+}
+
+void MainWindow::on_btnReset_clicked()
+{
+    if (managementList.size()<0)
+        return;
+
+    openjaus::transport::Address managementAddress = managementList.at(ui->cboManagement->currentIndex());
+
+    openjaus::core::Reset *cmd = new openjaus::core::Reset();
+    cmd->setDestination(managementAddress);
+    JAUSComponent->sendMessage(cmd);
+}
+
+void MainWindow::on_btnSetEmergency_clicked()
+{
+    if (managementList.size()<0)
+        return;
+
+    openjaus::transport::Address managementAddress = managementList.at(ui->cboManagement->currentIndex());
+
+    openjaus::core::SetEmergency *cmd = new openjaus::core::SetEmergency();
+    cmd->setDestination(managementAddress);
+    JAUSComponent->sendMessage(cmd);
+}
+
+void MainWindow::on_btnClearEmergency_clicked()
+{
+    if (managementList.size()<0)
+        return;
+
+    openjaus::transport::Address managementAddress = managementList.at(ui->cboManagement->currentIndex());
+
+    openjaus::core::ClearEmergency *cmd = new openjaus::core::ClearEmergency();
+    cmd->setDestination(managementAddress);
+    JAUSComponent->sendMessage(cmd);
 }
