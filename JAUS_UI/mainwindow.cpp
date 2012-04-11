@@ -107,7 +107,7 @@ void MainWindow::queryServices() {
     std::map<unsigned char, openjaus::model::Component * > components;
     std::map< std::string, openjaus::model::Service * > services;
 
-    subsystems = JAUSComponent->getSystemTree()->getSubsystems();
+    subsystems = jClient.getSystemTree()->getSubsystems();
 
     typedef std::map<short, openjaus::model::Subsystem* >::iterator it_subsys;
     typedef std::map<unsigned char, openjaus::model::Node* >::iterator it_node;
@@ -174,7 +174,7 @@ void MainWindow::queryServices() {
 void MainWindow::on_btnFindGPOS_clicked()
 {
     // find list of global pose sensors
-    gposList = JAUSComponent->getSystemTree()->lookupService("urn:jaus:jss:mobility:GlobalPoseSensor");
+    gposList = jClient.findGlobalPose();
 
     for(size_t i = 0; i < gposList.size(); i++)
     {
@@ -191,10 +191,6 @@ void MainWindow::on_btnFindGPOS_clicked()
 
 void MainWindow::on_btnQueryGpos_clicked()
 {
-    // send query to currently selected GPOS sensor
-    openjaus::mobility::QueryGlobalPose *query = new openjaus::mobility::QueryGlobalPose();
-    query->setQueryPresenceVector(65535);
-
     double rate = ui->txtGposRate->text().toDouble();
 
     if (gposList.size()<0)
@@ -202,34 +198,17 @@ void MainWindow::on_btnQueryGpos_clicked()
 
     openjaus::transport::Address gposAddress = gposList.at(ui->cboGposAddress->currentIndex());
 
-    // if the interval is 0, just send a single query, if not set up a periodic event
-    if(!gposSubscriptionId && rate > 0)
-    {
-        gposSubscriptionId = JAUSComponent->subscribePeriodic(gposAddress, query, rate);
-        std::cout << "Created Periodic Event: " << gposSubscriptionId << std::endl;
-    } else if (rate >0) {
-        std::cout << "Periodic event already exists" << gposSubscriptionId << std::endl;
-    } else {
-        query->setDestination(gposAddress);
-        JAUSComponent->sendMessage(query);
-    }
+    jClient.queryGlobalPose(gposAddress,rate);
 
-    if (gposSubscriptionId)
-        ui->btnUnsubscribeGpos->setEnabled(true);
-    else
-        ui->btnUnsubscribeGpos->setEnabled(false);
+    //if (gposSubscriptionId)
+    //    ui->btnUnsubscribeGpos->setEnabled(true);
+    //else
+    //    ui->btnUnsubscribeGpos->setEnabled(false);
 }
 
 void MainWindow::on_btnUnsubscribeGpos_clicked()
 {
-    if (gposSubscriptionId!=0){
-        std::cout << "Un-subscribing Periodic Event" << std::endl;
-        if(JAUSComponent->unsubscribe(gposSubscriptionId))
-        {
-            gposSubscriptionId = 0;
-            ui->btnUnsubscribeGpos->setEnabled(false);
-        }
-    }
+    jClient.unsubscribeGPos();
 }
 
 bool MainWindow::processReportGlobalPose(openjaus::mobility::ReportGlobalPose &report) {
@@ -250,7 +229,8 @@ void MainWindow::setGlobalPose(openjaus::mobility::ReportGlobalPose &newPose) {
 void MainWindow::on_btnFindPrimDriver_clicked()
 {
     // find list of global pose sensors
-    primDriverList = JAUSComponent->getSystemTree()->lookupService("urn:jaus:jss:mobility:PrimitiveDriver");
+    primDriverList = jClient.findPrimitiveDriver();
+
 
     for(size_t i = 0; i < primDriverList.size(); i++)
     {

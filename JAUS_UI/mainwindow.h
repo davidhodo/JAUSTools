@@ -89,6 +89,12 @@ private:
 
     void queryServices();
 
+    // list of found services
+    std::vector<openjaus::transport::Address> gposList;
+    std::vector<openjaus::transport::Address> primDriverList;
+    std::vector<openjaus::transport::Address> velDriverList;
+    std::vector<openjaus::transport::Address> accessControlList;
+    std::vector<openjaus::transport::Address> managementList;
 };
 
 #endif // MAINWINDOW_H

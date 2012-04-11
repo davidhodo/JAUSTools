@@ -2,6 +2,7 @@
 #define JAUSCLIENT_H
 
 #include <openjaus/core/Base.h>
+#include <vector>
 
 class JAUSClient : public openjaus::core::Base
 {
@@ -9,16 +10,35 @@ public:
     JAUSClient();
     ~JAUSClient();
 
+    std::vector<openjaus::transport::Address> findLocalPose();
 
+    std::vector<openjaus::transport::Address> findManagement();
+    std::vector<openjaus::transport::Address> findVelocityDriver();
+
+    ////////////////////////////////////////////////////////////////
+    // Access control methods
+    std::vector<openjaus::transport::Address> findAccessControl();
+    void requestControl(openjaus::transport::Address);
+    void releaseControl(openjaus::transport::Address);
+
+    ////////////////////////////////////////////////////////////////
+    // Management methods
+
+
+    ////////////////////////////////////////////////////////////////
+    // Global Pose methods
+    std::vector<openjaus::transport::Address> findGlobalPose();
+    void queryGlobalPose(openjaus::transport::Address, double rate);
+    void unsubscribeGPos();
+
+    ////////////////////////////////////////////////////////////////
+    // Global Pose methods
+    std::vector<openjaus::transport::Address> findPrimitiveDriver();
+    void sendPrimitiveDriver(openjaus::transport::Address, double linearX_per, double rotationalZ_per);
 
 
 private:
-    // list of found services
-    std::vector<openjaus::transport::Address> gposList;
-    std::vector<openjaus::transport::Address> primDriverList;
-    std::vector<openjaus::transport::Address> velDriverList;
-    std::vector<openjaus::transport::Address> accessControlList;
-    std::vector<openjaus::transport::Address> managementList;
+
 
 
     // new JAUS data callback methods
@@ -34,6 +54,8 @@ private:
     Joystick stick;  //!< joystick object
     bool stickInited;	//!< indicates if the joystick has been successfully initialized
     JoystickStatus curStatus;	//!< last read joystick status
+
+
 };
 
 #endif // JAUSCLIENT_H
