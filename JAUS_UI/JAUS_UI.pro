@@ -12,11 +12,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    joystick.cpp
+    joystick.cpp \
+    jausclient.cpp
 
 HEADERS  += mainwindow.h \
     qdebugstream.h \
-    joystick.h
+    joystick.h \
+    jausclient.h \
+    openjaus_structures.h
 
 FORMS    += mainwindow.ui
 

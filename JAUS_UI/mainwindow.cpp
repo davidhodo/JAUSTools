@@ -68,13 +68,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // set up JAUS components
     //openjaus::system::Application::setVerboseMode();
-    JAUSComponent = new openjaus::core::Base;
-    JAUSComponent->setName("JAUS_UI");
-    JAUSComponent->run();
+    jClient.setName("JAUS_UI");
+    jClient.run();
 
-    JAUSComponent->addMessageCallback(&MainWindow::processReportGlobalPose, this);
-    JAUSComponent->addMessageCallback(&MainWindow::processReportControl, this);
-    JAUSComponent->addMessageCallback(&MainWindow::processReportStatus, this);
+    //JAUSComponent->addMessageCallback(&MainWindow::processReportGlobalPose, this);
+    //JAUSComponent->addMessageCallback(&MainWindow::processReportControl, this);
+    //JAUSComponent->addMessageCallback(&MainWindow::processReportStatus, this);
 
     this->connect(this,SIGNAL(globalPoseChanged(openjaus::mobility::ReportGlobalPose&)),this,SLOT(setGlobalPose(openjaus::mobility::ReportGlobalPose&)));
     qRegisterMetaType<openjaus::mobility::ReportGlobalPose>("openjaus::mobility::ReportGlobalPose&");
@@ -85,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this,SIGNAL(setStatus(QString)),ui->txtManagementStatus,SLOT(setText(QString)));
 
     // do initial query for services
-    on_pbQueryServices_clicked();
+    queryServices();
 }
 
 
@@ -97,6 +96,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pbQueryServices_clicked()
 {
+    queryServices();
+}
+
+void MainWindow::queryServices() {
     // query discovery service for list of subsystems
     //const std::map< short, openjaus::model::Subsystem * > curSubs;
     std::map<short, openjaus::model::Subsystem * > subsystems;
@@ -111,6 +114,7 @@ void MainWindow::on_pbQueryServices_clicked()
     typedef std::map<unsigned char, openjaus::model::Component * >::iterator it_comp;
     typedef std::map<std::string, openjaus::model::Service * >::iterator it_serv;
 
+    //TODO: do i have a memory leak here?
     QStandardItemModel *standardModel = new QStandardItemModel ;
 
     QStandardItem *prevItem = standardModel->invisibleRootItem();

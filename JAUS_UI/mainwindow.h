@@ -9,6 +9,7 @@
 #include <openjaus/mobility/GlobalPoseSensor.h>
 #include <openjaus/mobility/PrimitiveDriver.h>
 #include "joystick.h"
+#include "jausclient.h"
 
 #include <map>
 #include <vector>
@@ -81,34 +82,12 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QDebugStream *qout;
-    openjaus::core::Base *JAUSComponent;
 
-    uint32_t gposSubscriptionId;
-
-    // list of found services
-    std::vector<openjaus::transport::Address> gposList;
-    std::vector<openjaus::transport::Address> primDriverList;
-    std::vector<openjaus::transport::Address> velDriverList;
-    std::vector<openjaus::transport::Address> accessControlList;
-    std::vector<openjaus::transport::Address> managementList;
-
-
-    // new JAUS data callback methods
-    bool processReportGlobalPose(openjaus::mobility::ReportGlobalPose &report);
-    bool processReportControl(openjaus::core::ReportControl& report);
-    bool processReportStatus(openjaus::core::ReportStatus& report);
-
-    //void processControlResponse(const openjaus::model::ControlResponse& response);
-
-
-    openjaus::mobility::ReportGlobalPose curGlobalPose;
-
-    // joystick members and methods
-    Joystick stick;  //!< joystick object
-    bool stickInited;	//!< indicates if the joystick has been successfully initialized
-    JoystickStatus curStatus;	//!< last read joystick status
     QTimer *joystickTimer;
 
+    JAUSClient jClient;
+
+    void queryServices();
 
 };
 
