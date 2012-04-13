@@ -2,6 +2,7 @@
 #define JAUSCLIENT_H
 
 #include <openjaus/core/Base.h>
+#include <openjaus/mobility.h>
 #include <vector>
 
 class JAUSClient : public openjaus::core::Base
@@ -12,7 +13,6 @@ public:
 
     std::vector<openjaus::transport::Address> findLocalPose();
 
-    std::vector<openjaus::transport::Address> findManagement();
     std::vector<openjaus::transport::Address> findVelocityDriver();
 
     ////////////////////////////////////////////////////////////////
@@ -20,10 +20,18 @@ public:
     std::vector<openjaus::transport::Address> findAccessControl();
     void requestControl(openjaus::transport::Address);
     void releaseControl(openjaus::transport::Address);
+    void queryControl(openjaus::transport::Address);
 
     ////////////////////////////////////////////////////////////////
     // Management methods
-
+    std::vector<openjaus::transport::Address> findManagement();
+    void queryManagementStatus(openjaus::transport::Address);
+    void sendShutdown(openjaus::transport::Address);
+    void sendStandby(openjaus::transport::Address);
+    void sendResume(openjaus::transport::Address);
+    void sendSetEmergency(openjaus::transport::Address);
+    void sendClearEmergency(openjaus::transport::Address);
+    void sendReset(openjaus::transport::Address);
 
     ////////////////////////////////////////////////////////////////
     // Global Pose methods
@@ -49,11 +57,6 @@ private:
     openjaus::mobility::ReportGlobalPose curGlobalPose;
 
     uint32_t gposSubscriptionId;
-
-    // joystick members and methods
-    Joystick stick;  //!< joystick object
-    bool stickInited;	//!< indicates if the joystick has been successfully initialized
-    JoystickStatus curStatus;	//!< last read joystick status
 
 
 };

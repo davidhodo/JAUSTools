@@ -83,10 +83,16 @@ private:
     Ui::MainWindow *ui;
     QDebugStream *qout;
 
+    // joystick members and methods
+    Joystick stick;  //!< joystick object
+    bool stickInited;   //!< indicates if the joystick has been successfully initialized
+    JoystickStatus curStatus;   //!< last read joystick status
     QTimer *joystickTimer;
 
+    // JAUS UI Client
     JAUSClient jClient;
 
+    // update treeview with list of discovered services
     void queryServices();
 
     // list of found services
@@ -95,6 +101,11 @@ private:
     std::vector<openjaus::transport::Address> velDriverList;
     std::vector<openjaus::transport::Address> accessControlList;
     std::vector<openjaus::transport::Address> managementList;
+
+
+    bool processReportGlobalPose(openjaus::mobility::ReportGlobalPose &report);
+    bool processReportControl(openjaus::core::ReportControl& report);
+    bool processReportStatus(openjaus::core::ReportStatus& report);
 };
 
 #endif // MAINWINDOW_H

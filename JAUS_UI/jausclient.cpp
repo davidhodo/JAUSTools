@@ -2,10 +2,11 @@
 
 JAUSClient::JAUSClient()
 {
+    gposSubscriptionId=0;
 }
 
 std::vector<openjaus::transport::Address> JAUSClient::findGlobalPose(){
-    return JsystemTree()->lookupService("urn:jaus:jss:mobility:GlobalPoseSensor");
+    return systemTree->lookupService("urn:jaus:jss:mobility:GlobalPoseSensor");
 }
 
 void JAUSClient::queryGlobalPose(openjaus::transport::Address gposAddress, double rate) {
@@ -33,26 +34,20 @@ void JAUSClient::unsubscribeGPos() {
         if(unsubscribe(gposSubscriptionId))
         {
             gposSubscriptionId = 0;
-            ui->btnUnsubscribeGpos->setEnabled(false);
         }
     }
 }
 
 
 std::vector<openjaus::transport::Address> JAUSClient::findLocalPose(){
-    return JsystemTree()->lookupService("urn:jaus:jss:mobility:LocalPoseSensor");
+    return systemTree->lookupService("urn:jaus:jss:mobility:LocalPoseSensor");
 }
 
 std::vector<openjaus::transport::Address> JAUSClient::findPrimitiveDriver(){
-    return JsystemTree()->lookupService("urn:jaus:jss:mobility:PrimitiveDriver");
+    return systemTree->lookupService("urn:jaus:jss:mobility:PrimitiveDriver");
 }
 
-void JAUSClient::sendPrimitiveDriver(openjaus::transport::Address , double linearX_per, double rotationalZ_per) {
-
-    if (primDriverList.size()<0)
-        return;
-
-    openjaus::transport::Address primDriverAddress = primDriverList.at(ui->cboPrimDriverAddress->currentIndex());
+void JAUSClient::sendPrimitiveDriver(openjaus::transport::Address primDriverAddress, double linearX_per, double rotationalZ_per) {
 
     openjaus::mobility::SetWrenchEffort *cmd=new openjaus::mobility::SetWrenchEffort;
     cmd->setDestination(primDriverAddress);
@@ -61,7 +56,7 @@ void JAUSClient::sendPrimitiveDriver(openjaus::transport::Address , double linea
     cmd->setPresenceVector(0);
 
     cmd->enablePropulsiveLinearEffortX();
-    cmd->setPropulsiveLinearEffortX_percent(linearX);
+    cmd->setPropulsiveLinearEffortX_percent(linearX_per);
 
     cmd->enablePropulsiveRotationalEffortZ();
     cmd->setPropulsiveRotationalEffortZ_percent(rotationalZ_per);
@@ -71,15 +66,86 @@ void JAUSClient::sendPrimitiveDriver(openjaus::transport::Address , double linea
 
 
 std::vector<openjaus::transport::Address> JAUSClient::findManagement(){
-    return JsystemTree()->lookupService("urn:jaus:jss:mobility:PrimitiveDriver");
+    return systemTree->lookupService("urn:jaus:jss:core:Management");
 }
+
+void JAUSClient::queryManagementStatus(openjaus::transport::Address managementAddress) {
+
+    openjaus::core::QueryStatus *qry = new openjaus::core::QueryStatus();
+    qry->setDestination(managementAddress);
+    sendMessage(qry);
+}
+
 
 std::vector<openjaus::transport::Address> JAUSClient::findAccessControl(){
-    return JsystemTree()->lookupService("urn:jaus:jss:mobility:PrimitiveDriver");
+    return systemTree->lookupService("urn:jaus:jss:core:AccessControl");
 }
+
+
+void JAUSClient::requestControl(openjaus::transport::Address accessControlAddress) {
+    //openjaus::core::ReleaseControl *cmd = new openjaus::core::ReleaseControl();
+    //JAUSComponent->sendMessage(cmd);
+    //requestControl(accessControlAddress, processControlResponse);
+    requestControl(accessControlAddress);
+}
+
+void JAUSClient::releaseControl(openjaus::transport::Address accessControlAddress) {
+
+    try {
+        //openjaus::core::RequestControl *cmd = new openjaus::core::RequestControl();
+        //JAUSComponent->sendMessage(cmd);
+        releaseControl(accessControlAddress);
+        std::cout << "Release Control of Service at " << accessControlAddress << std::endl;
+
+    } catch (std::exception &e) {
+
+    }
+}
+
+void JAUSClient::queryControl(openjaus::transport::Address accessControlAddress) {
+    openjaus::core::QueryControl *qry = new openjaus::core::QueryControl();
+    qry->setDestination(accessControlAddress);
+    sendMessage(qry);
+}
+
 
 std::vector<openjaus::transport::Address> JAUSClient::findVelocityDriver(){
-    return JsystemTree()->lookupService("urn:jaus:jss:mobility:PrimitiveDriver");
+    return systemTree->lookupService("urn:jaus:jss:mobility:PrimitiveDriver");
 }
 
 
+void JAUSClient::sendShutdown(openjaus::transport::Address managementAddress){
+    openjaus::core::Shutdown *cmd = new openjaus::core::Shutdown();
+    cmd->setDestination(managementAddress);
+    sendMessage(cmd);
+}
+
+void JAUSClient::sendStandby(openjaus::transport::Address managementAddress){
+    openjaus::core::Standby *cmd = new openjaus::core::Standby();
+    cmd->setDestination(managementAddress);
+    sendMessage(cmd);
+}
+
+void JAUSClient::sendResume(openjaus::transport::Address managementAddress){
+    openjaus::core::Resume *res = new openjaus::core::Resume();
+    res->setDestination(managementAddress);
+    sendMessage(res);
+}
+
+void JAUSClient::sendSetEmergency(openjaus::transport::Address managementAddress){
+    openjaus::core::SetEmergency *cmd = new openjaus::core::SetEmergency();
+    cmd->setDestination(managementAddress);
+    sendMessage(cmd);
+}
+
+void JAUSClient::sendClearEmergency(openjaus::transport::Address managementAddress){
+    openjaus::core::ClearEmergency *cmd = new openjaus::core::ClearEmergency();
+    cmd->setDestination(managementAddress);
+    sendMessage(cmd);
+}
+
+void JAUSClient::sendReset(openjaus::transport::Address managementAddress){
+    openjaus::core::Reset *cmd = new openjaus::core::Reset();
+    cmd->setDestination(managementAddress);
+    sendMessage(cmd);
+}

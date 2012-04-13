@@ -26,7 +26,11 @@ int main(void)
 
 		printMenu();
 
-		usleep(2000000);
+		#ifdef WIN32
+			Sleep(2000);
+		#else
+			usleep(2000000);
+		#endif
 		//myDriver.findPrimitiveDriver();
 		//myDriver.requestDriverControl();
 		//usleep(2000000);
